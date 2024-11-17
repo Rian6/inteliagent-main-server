@@ -1,13 +1,13 @@
 package com.inteliagent.main_server.controller.http;
 
+import com.inteliagent.main_server.entity.ConfirmLoads;
+import com.inteliagent.main_server.entity.Consumer;
+import com.inteliagent.main_server.entity.ConsumerLoads;
 import com.inteliagent.main_server.entity.Sync;
 import com.inteliagent.main_server.service.SyncService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.util.List;
@@ -22,10 +22,33 @@ public class SyncController {
     @PostMapping("/sync")
     public ResponseEntity<?> sync(@RequestBody List<Sync> syncList) {
         try {
-            List<String> confirmLoads = syncService.sync(syncList);
+            ConfirmLoads confirmLoads = syncService.sync(syncList);
             return ResponseEntity.created(new URI("")).body(confirmLoads);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Erro ao syncronizar cargas: " + e.getMessage());
+        }
+    }
+    @GetMapping("/consumer/{idUsuario}")
+    public ResponseEntity<?> consumer(
+            @PathVariable int idUsuario,
+            @RequestParam Boolean isLoadFull) {
+        try {
+            Consumer consumerEntities = syncService.consumer(idUsuario, isLoadFull);
+            return ResponseEntity.created(new URI("")).body(consumerEntities);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Erro ao sincronizar cargas: " + e.getMessage());
+        }
+    }
+    @PostMapping("/consumer-confirm/{idUsuario}")
+    public ResponseEntity<?> consumerConfirm(
+            @PathVariable int idUsuario,
+            @RequestParam String dataHora,
+            @RequestBody List<String> tables) {
+        try {
+            syncService.consumerConfirm(tables, dataHora, idUsuario);
+            return ResponseEntity.ok("");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Erro ao sincronizar cargas: " + e.getMessage());
         }
     }
 }

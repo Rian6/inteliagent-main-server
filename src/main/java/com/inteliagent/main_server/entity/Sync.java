@@ -3,31 +3,31 @@ package com.inteliagent.main_server.entity;
 import java.util.List;
 
 public class Sync {
-    private String tableName;
-    private String cabecalho;
-    private List<String> rotina;
+    private String id;
+    private String tabela;
+    private String sql;
 
-    public String getTableName() {
-        return tableName;
+    public String getId() {
+        return id;
     }
 
-    public void setTableName(String tableName) {
-        this.tableName = tableName;
+    public void setId(String id) {
+        this.id = id;
     }
 
-    public List<String> getRotina() {
-        return rotina;
+    public String getTabela() {
+        return tabela;
     }
 
-    public void setRotina(List<String> rotina) {
-        this.rotina = rotina;
+    public void setTabela(String tabela) {
+        this.tabela = tabela;
     }
 
-    public String getCabecalho() {
-        return cabecalho;
+    public String getSql() {
+        return sql;
     }
 
-    public void setCabecalho(String cabecalho) {
-        this.cabecalho = cabecalho;
+    public void setSql(String sql) {
+        this.sql = sql;
     }
 }

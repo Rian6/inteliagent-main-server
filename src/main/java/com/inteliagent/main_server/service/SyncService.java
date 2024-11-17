@@ -1,12 +1,13 @@
 package com.inteliagent.main_server.service;
 
-import com.inteliagent.main_server.entity.Sync;
+import com.inteliagent.main_server.entity.*;
 import com.inteliagent.main_server.persistence.SyncPersistence;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class SyncService {
@@ -14,34 +15,90 @@ public class SyncService {
     @Autowired
     private SyncPersistence syncPersistence;
 
-    public List<String> sync(List<Sync> syncList){
+    public ConfirmLoads sync(List<Sync> syncList){
 
-        List<String> confirmTables = new ArrayList<>();
+        List<String> confirmIds = new ArrayList<>();
 
         for(Sync sync: syncList) {
             try{
-                String load = mountSQL(sync);
-                syncPersistence.genericSave(load);
+                syncPersistence.genericSave(sync.getSql());
+                confirmIds.add(sync.getId());
             } catch (Exception e) {
                 System.err.println(e.getMessage());
             }
         }
-
-        return confirmTables;
+        ConfirmLoads confirmLoads = new ConfirmLoads();
+        confirmLoads.setConfirmedIds(confirmIds);
+        return confirmLoads;
     }
 
-    private String mountSQL(Sync sync){
-        String sql = "REPLACE INTO "+sync.getTableName()+" ("+sync.getCabecalho()+") VALUES";
+    public Consumer consumer(int idUsuario, boolean loadFull) throws Exception {
+        String horaInicioProcesso = syncPersistence.getHoraBanco();
+        List<SyncTables> syncTablesList = syncPersistence.getSyncTables();
+        List<ConsumerLoads> consumerLoadsList = getConsumerLoads(syncTablesList, horaInicioProcesso, idUsuario, loadFull);
 
-        StringBuilder rotinaBuilder = new StringBuilder();
-        for(int i=0; i<sync.getRotina().size(); i++){
-            String rotina = sync.getRotina().get(i);
-            rotinaBuilder.append(" (").append(rotina).append(")");
+        Consumer consumer = new Consumer();
+        consumer.setDataHoraInicioProcesso(horaInicioProcesso);
+        consumer.setConsumerLoadsList(consumerLoadsList);
 
-            String virgula = i<sync.getRotina().size()-1 ? ",\n" : "\n";
-            rotinaBuilder.append(virgula);
-        }
-        sql = sql + rotinaBuilder;
-        return sql;
+        return consumer;
     }
+
+    public void consumerConfirm(List<String> tables, String dataHora, int idUsuario ) throws Exception {
+        tables.forEach(table->{
+            try {
+                syncPersistence.confirmTables(table, idUsuario, dataHora);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
+    }
+
+    private List<ConsumerLoads> getConsumerLoads(List<SyncTables> syncTablesList, String horaInicioProcesso, int idUsuario, boolean loadFull){
+        return syncTablesList.stream().map(syncTables -> {
+            try {
+                String horaUltimoSincronismo = "0000-00-00 00:00";
+                if(!loadFull){
+                    horaUltimoSincronismo = syncPersistence.getHoraUltimoSincronismo(syncTables.getTableName(), idUsuario);
+                    horaUltimoSincronismo = horaUltimoSincronismo == null ? "0000-00-00 00:00" : horaUltimoSincronismo;
+                }
+
+                String rotina = formatarRotina(syncTables.getRotina(), horaUltimoSincronismo, horaInicioProcesso);
+                List<String> rotinaDados = syncPersistence.genericSelect(rotina, horaUltimoSincronismo, horaInicioProcesso);
+                if(rotinaDados.size() > 1){
+                    ConsumerLoads consumerLoads = new ConsumerLoads();
+
+                    consumerLoads.setTableName(syncTables.getTableName());
+                    consumerLoads.setCabecalho(rotinaDados.getFirst());
+                    rotinaDados.removeFirst();
+
+                    StringBuilder registros = new StringBuilder();
+                    rotinaDados.forEach(data -> registros.append(data).append(", "));
+
+                    if (!registros.isEmpty()) {
+                        registros.setLength(registros.length() - 2);
+                        registros.append(";");
+                    }
+
+                    consumerLoads.setData(registros.toString());
+                    return consumerLoads;
+                }
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+            return null;
+        })
+        .filter(Objects::nonNull)
+        .toList();
+    }
+
+    private String formatarRotina(String rotina, String dataUltimoSincronismo, String dataAtual) {
+        String dataUltimoSincronismoEscapada = dataUltimoSincronismo.replace("'", "''");
+        String dataAtualEscapada = dataAtual.replace("'", "''");
+
+        String novaRotina = rotina;
+
+        return novaRotina;
+    }
+
 }
