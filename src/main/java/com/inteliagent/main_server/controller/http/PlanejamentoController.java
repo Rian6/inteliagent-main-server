@@ -1,9 +1,7 @@
 package com.inteliagent.main_server.controller.http;
 
 import com.inteliagent.main_server.dto.*;
-import com.inteliagent.main_server.entity.Sync;
 import com.inteliagent.main_server.service.PlanejamentoService;
-import com.inteliagent.main_server.service.VisitaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
