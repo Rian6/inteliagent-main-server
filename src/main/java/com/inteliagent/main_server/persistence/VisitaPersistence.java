@@ -17,7 +17,7 @@ public class VisitaPersistence {
 
     public void salvar(VisitaSalvarDTO visitaSalvarDTO){
         HashMap<String, Object> map = new HashMap<>();
-        String uuid = visitaSalvarDTO.getUuid().equals("0") ? UUID.randomUUID().toString() : visitaSalvarDTO.getUuid();
+        String uuid = visitaSalvarDTO.getUuid() == null || visitaSalvarDTO.getUuid().equals("0") ? UUID.randomUUID().toString() : visitaSalvarDTO.getUuid();
         map.put("ID", uuid);
         map.put("NOME", visitaSalvarDTO.getNome());
         map.put("CEP", visitaSalvarDTO.getCep());
@@ -75,6 +75,36 @@ public class VisitaPersistence {
             visitasPorDiaDTO.setData(rs.getString("data"));
             visitasPorDiaDTO.setQuantidade(rs.getInt("quantidade"));
             return visitasPorDiaDTO;
+        });
+    }
+
+    public List<VisitaListDTO> getVisitasByPlanejamento(String idPlanejamento){
+        HashMap<String, Object> sqlMap = new HashMap<>();
+        sqlMap.put("IDPLANEJAMENTO", idPlanejamento);
+
+        final String sql = "SELECT \n" +
+                " v.id," +
+                " v.cep," +
+                " v.numero,\n" +
+                " v.sequencia,\n" +
+                " v.nome\n" +
+                "FROM \n" +
+                "    visita v\n" +
+                "INNER JOIN \n" +
+                "    planejamento p \n" +
+                "ON \n" +
+                "    p.ID = v.ID_PLANEJAMENTO\n" +
+                "   WHERE p.id = :IDPLANEJAMENTO";
+
+        return jdbcTemplate.query(sql, sqlMap, (rs, rowNum) -> {
+            VisitaListDTO visitaListDTO = new VisitaListDTO();
+            visitaListDTO.setId(rs.getString("ID"));
+            visitaListDTO.setCep(rs.getString("CEP"));
+            visitaListDTO.setNumero(rs.getString("NUMERO"));
+            visitaListDTO.setSequencia(rs.getInt("SEQUENCIA"));
+            visitaListDTO.setNome(rs.getString("NOME"));
+
+            return visitaListDTO;
         });
     }
 }

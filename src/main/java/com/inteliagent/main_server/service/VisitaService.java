@@ -52,4 +52,14 @@ public class VisitaService {
 
         return null;
     }
+
+    public List<VisitaListDTO> getVisitasByPlanejamento(String idPlanejamento){
+        try{
+            return visitaPersistence.getVisitasByPlanejamento(idPlanejamento);
+        } catch (Exception e) {
+            System.err.println(e.getMessage());
+        }
+
+        return null;
+    }
 }
