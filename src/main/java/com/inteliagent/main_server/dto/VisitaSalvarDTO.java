@@ -5,6 +5,8 @@ public class VisitaSalvarDTO {
     private String cep;
     private String nome;
     private String numero;
+    private double lat;
+    private double lng;
     private int sequencia;
     private String idPlanejamento;
 
@@ -54,5 +56,21 @@ public class VisitaSalvarDTO {
 
     public void setIdPlanejamento(String idPlanejamento) {
         this.idPlanejamento = idPlanejamento;
+    }
+
+    public double getLat() {
+        return lat;
+    }
+
+    public void setLat(double lat) {
+        this.lat = lat;
+    }
+
+    public double getLng() {
+        return lng;
+    }
+
+    public void setLng(double lng) {
+        this.lng = lng;
     }
 }

@@ -6,6 +6,8 @@ public class VisitaListDTO {
     private String numero;
     private int sequencia;
     private String nome;
+    private double lat;
+    private double lng;
 
     public String getId() {
         return id;
@@ -45,5 +47,21 @@ public class VisitaListDTO {
 
     public void setNome(String nome) {
         this.nome = nome;
+    }
+
+    public double getLat() {
+        return lat;
+    }
+
+    public void setLat(double lat) {
+        this.lat = lat;
+    }
+
+    public double getLng() {
+        return lng;
+    }
+
+    public void setLng(double lng) {
+        this.lng = lng;
     }
 }

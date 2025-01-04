@@ -47,10 +47,10 @@ public class PlanejamentoPersistence {
         String uuid = planejamentoSalvarDTO.getUuid().equals("0") ? UUID.randomUUID().toString() : planejamentoSalvarDTO.getUuid();
         map.put("ID", uuid);
         map.put("NOME", planejamentoSalvarDTO.getNomeRegiao());
-        map.put("DATAVISITA", planejamentoSalvarDTO.getDataVisita());
-        map.put("SITUACAO", planejamentoSalvarDTO.getSituacao());
+        map.put("ZONA", planejamentoSalvarDTO.getZona());
+        map.put("STATUS", planejamentoSalvarDTO.getSituacao());
 
-        String sql = "replace into PLANEJAMENTO (id, NOME, DATA_ULT_VISITA, SITUACAO) VALUES (:ID, :NOME, :DATAVISITA, :SITUACAO)";
+        String sql = "replace into PLANEJAMENTO (id, NOME, ZONA, STATUS, DATA_ULT_VISITA, SITUACAO) VALUES (:ID, :NOME, :ZONA, :STATUS, NOW(), 1)";
         jdbcTemplate.update(sql, map);
 
         return uuid;

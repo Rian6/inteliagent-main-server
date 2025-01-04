@@ -21,11 +21,13 @@ public class VisitaPersistence {
         map.put("ID", uuid);
         map.put("NOME", visitaSalvarDTO.getNome());
         map.put("CEP", visitaSalvarDTO.getCep());
+        map.put("LATITUDE", visitaSalvarDTO.getLat());
+        map.put("LONGITUDE", visitaSalvarDTO.getLng());
         map.put("NUMERO", visitaSalvarDTO.getNumero());
         map.put("SEQUENCIA", visitaSalvarDTO.getSequencia());
         map.put("IDPLANEJAMENTO", visitaSalvarDTO.getIdPlanejamento());
 
-        String sql = "replace into VISITA (id, NOME, CEP, NUMERO, SEQUENCIA, ID_PLANEJAMENTO) VALUES (:ID, :NOME, :CEP, :NUMERO, :SEQUENCIA, :IDPLANEJAMENTO)";
+        String sql = "replace into VISITA (id, NOME, CEP, NUMERO, SEQUENCIA, ID_PLANEJAMENTO, LATITUDE, LONGITUDE, SITUACAO) VALUES (:ID, :NOME, :CEP, :NUMERO, :SEQUENCIA, :IDPLANEJAMENTO, :LATITUDE, :LONGITUDE, 1)";
         jdbcTemplate.update(sql, map);
     }
 
@@ -87,6 +89,8 @@ public class VisitaPersistence {
                 " v.cep," +
                 " v.numero,\n" +
                 " v.sequencia,\n" +
+                " v.latitude,\n" +
+                " v.longitude,\n" +
                 " v.nome\n" +
                 "FROM \n" +
                 "    visita v\n" +
@@ -102,6 +106,8 @@ public class VisitaPersistence {
             visitaListDTO.setCep(rs.getString("CEP"));
             visitaListDTO.setNumero(rs.getString("NUMERO"));
             visitaListDTO.setSequencia(rs.getInt("SEQUENCIA"));
+            visitaListDTO.setLat(rs.getDouble("LATITUDE"));
+            visitaListDTO.setLng(rs.getDouble("LONGITUDE"));
             visitaListDTO.setNome(rs.getString("NOME"));
 
             return visitaListDTO;

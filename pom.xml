@@ -46,6 +46,13 @@
 			<artifactId>mysql-connector-j</artifactId>
 			<scope>runtime</scope>
 		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/com.google.ortools/ortools-java -->
+		<dependency>
+			<groupId>com.google.ortools</groupId>
+			<artifactId>ortools-java</artifactId>
+			<version>9.10.4067</version>
+		</dependency>
 	</dependencies>
 
 	<build>
