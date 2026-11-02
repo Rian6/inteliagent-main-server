@@ -1,87 +1,57 @@
 package com.inteliagent.main_server.controller.http;
 
 import com.inteliagent.main_server.dto.*;
-import com.inteliagent.main_server.entity.Location;
 import com.inteliagent.main_server.entity.Visita;
+import com.inteliagent.main_server.service.RouteOptimizationService;
 import com.inteliagent.main_server.service.VisitaService;
-import com.inteliagent.main_server.tools.RouterOptimize;
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import com.google.ortools.constraintsolver.*;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.beans.factory.annotation.Value;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
+/** HTTP adaptation only; authorization and persistence belong to application services. */
 @RestController
 @RequestMapping("/api")
 public class VisitaController {
-    //@Value("${google.maps.api.key}")
-    private String googleMapsApiKey;
+    private final VisitaService visits;
+    private final RouteOptimizationService routes;
+    private final com.inteliagent.main_server.persistence.VisitaPersistence persistence;
 
-    @Autowired
-    private VisitaService visitaService;
-
-    private RouterOptimize routeOptimizer;
-    public VisitaController() {
-        this.routeOptimizer = new RouterOptimize();
+    public VisitaController(VisitaService visits, RouteOptimizationService routes, com.inteliagent.main_server.persistence.VisitaPersistence persistence) {
+        this.visits = visits;
+        this.routes = routes;
+        this.persistence = persistence;
     }
+
     @GetMapping("/ultimas-visitas")
-    public ResponseEntity<?> getUltimasVisitas() {
-        try {
-            List<VisitaDTO> ultimasVisitas = visitaService.getUltimasVisitas();
-            return ResponseEntity.created(new URI("")).body(ultimasVisitas);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Erro ao syncronizar cargas: " + e.getMessage());
-        }
-    }
+    public List<VisitaDTO> latest() { return visits.getUltimasVisitas(); }
 
     @PostMapping("/visita/salvar")
-    public ResponseEntity<?> salvar(@RequestBody List<VisitaSalvarDTO> visitaSalvarDTO) {
-        try {
-            visitaService.salvar(visitaSalvarDTO);
-            return ResponseEntity.ok("");
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Erro ao syncronizar cargas: " + e.getMessage());
-        }
+    public ResponseEntity<Void> save(@RequestBody List<VisitaSalvarDTO> batch) {
+        visits.salvar(batch);
+        return ResponseEntity.ok().build();
     }
+
+    public record VisitOrder(String idPlanejamento,List<String> ids){}
+    @PostMapping("/visita/reordenar")
+    public ResponseEntity<Void> reorder(@RequestBody VisitOrder order){persistence.reorder(order.idPlanejamento(),order.ids());return ResponseEntity.ok().build();}
 
     @GetMapping("/visitas-por-dia")
-    public ResponseEntity<?> getVisitasPorDia() {
-        try {
-            List<VisitasPorDiaDTO> visitas = visitaService.getVisitasPorDia();
-            return ResponseEntity.created(new URI("")).body(visitas);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Erro ao syncronizar cargas: " + e.getMessage());
-        }
-    }
+    public List<VisitasPorDiaDTO> byDay() { return visits.getVisitasPorDia(); }
 
     @GetMapping("/visitas-por-regiao")
-    public ResponseEntity<?> getVisitasPorRegião() {
-        try {
-            List<VisitasPorRegiaoDTO> visitas = visitaService.getVisitasPorRegião();
-            return ResponseEntity.created(new URI("")).body(visitas);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Erro ao syncronizar cargas: " + e.getMessage());
-        }
-    }
+    public List<VisitasPorRegiaoDTO> byRegion() { return visits.getVisitasPorRegião(); }
 
     @GetMapping("/visitas-list/{uuid}")
-    public ResponseEntity<?> getAllPlanejamentos(@PathVariable String uuid) {
-        try {
-            List<VisitaListDTO> visitas = visitaService.getVisitasByPlanejamento(uuid);
-            return ResponseEntity.created(new URI("")).body(visitas);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Erro ao syncronizar cargas: " + e.getMessage());
-        }
-    }
+    public List<VisitaListDTO> list(@PathVariable String uuid) { return visits.getVisitasByPlanejamento(uuid); }
+
+    @GetMapping("/visita/{id}/ficha")
+    public java.util.Map<String,Object> details(@PathVariable String id) { return persistence.details(id); }
 
     @PostMapping("/optimize-route")
-    public List<Visita> optimizeRoute(@RequestBody List<Visita> visitas) {
-        return routeOptimizer.optimizeRoute(visitas);
+    public List<Visita> optimize(@RequestBody List<Visita> visits) { persistence.requireReorderPermission(); return routes.optimize(visits); }
+
+    @DeleteMapping("/visita/{id}")
+    public ResponseEntity<Void> delete(@PathVariable String id) {
+        return visits.delete(id) ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
     }
 }

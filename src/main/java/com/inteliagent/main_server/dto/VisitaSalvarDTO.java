@@ -1,13 +1,29 @@
 package com.inteliagent.main_server.dto;
 
 public class VisitaSalvarDTO {
+    private String boletimJson;
+    public String getBoletimJson(){return boletimJson;}
+    public void setBoletimJson(String value){boletimJson=value;}
+    private String tipoVisita;
+    public String getTipoVisita() { return tipoVisita; }
+    public void setTipoVisita(String value) { tipoVisita = value; }
+    private String complemento;
+    public String getComplemento() { return complemento; }
+    public void setComplemento(String value) { complemento = value; }
+    private String lado;
+    public String getLado() { return lado; }
+    public void setLado(String value) { lado = value; }
+    private String tipoImovel;
+    public String getTipoImovel() { return tipoImovel; }
+    public void setTipoImovel(String value) { tipoImovel = value; }
+
     private String uuid;
     private String cep;
     private String nome;
     private String numero;
-    private double lat;
-    private double lng;
-    private int sequencia;
+    private Double lat;
+    private Double lng;
+    private Integer sequencia;
     private String idPlanejamento;
 
     public String getUuid() {
@@ -42,11 +58,11 @@ public class VisitaSalvarDTO {
         this.numero = numero;
     }
 
-    public int getSequencia() {
+    public Integer getSequencia() {
         return sequencia;
     }
 
-    public void setSequencia(int sequencia) {
+    public void setSequencia(Integer sequencia) {
         this.sequencia = sequencia;
     }
 
@@ -58,19 +74,19 @@ public class VisitaSalvarDTO {
         this.idPlanejamento = idPlanejamento;
     }
 
-    public double getLat() {
+    public Double getLat() {
         return lat;
     }
 
-    public void setLat(double lat) {
+    public void setLat(Double lat) {
         this.lat = lat;
     }
 
-    public double getLng() {
+    public Double getLng() {
         return lng;
     }
 
-    public void setLng(double lng) {
+    public void setLng(Double lng) {
         this.lng = lng;
     }
 }

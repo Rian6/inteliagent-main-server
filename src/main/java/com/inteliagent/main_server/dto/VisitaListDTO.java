@@ -1,13 +1,29 @@
 package com.inteliagent.main_server.dto;
 
 public class VisitaListDTO {
+    private String boletimJson;
+    public String getBoletimJson(){return boletimJson;}
+    public void setBoletimJson(String value){boletimJson=value;}
+    private String tipoVisita;
+    public String getTipoVisita() { return tipoVisita; }
+    public void setTipoVisita(String value) { tipoVisita = value; }
+    private String complemento;
+    public String getComplemento() { return complemento; }
+    public void setComplemento(String value) { complemento = value; }
+    private String lado;
+    public String getLado() { return lado; }
+    public void setLado(String value) { lado = value; }
+    private String tipoImovel;
+    public String getTipoImovel() { return tipoImovel; }
+    public void setTipoImovel(String value) { tipoImovel = value; }
+
     private String id;
     private String cep;
     private String numero;
     private int sequencia;
     private String nome;
-    private double lat;
-    private double lng;
+    private Double lat;
+    private Double lng;
 
     public String getId() {
         return id;
@@ -49,19 +65,19 @@ public class VisitaListDTO {
         this.nome = nome;
     }
 
-    public double getLat() {
+    public Double getLat() {
         return lat;
     }
 
-    public void setLat(double lat) {
+    public void setLat(Double lat) {
         this.lat = lat;
     }
 
-    public double getLng() {
+    public Double getLng() {
         return lng;
     }
 
-    public void setLng(double lng) {
+    public void setLng(Double lng) {
         this.lng = lng;
     }
 }

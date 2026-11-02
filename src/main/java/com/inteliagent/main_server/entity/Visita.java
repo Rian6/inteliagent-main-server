@@ -11,6 +11,8 @@ public class Visita {
     private Location location;
     private int ordem;  // Campo para armazenar a posição da visita na rota otimizada
 
+    public Visita() {}
+
     public Visita(Long id, String endereco, String nome, String numero, String cep, Double lat, Double lng) {
         this.id = id;
         this.endereco = endereco;
@@ -80,7 +82,7 @@ public class Visita {
     }
 
     public Location getLocation() {
-        return location;
+        return location != null ? location : (lat != null && lng != null ? new Location(lat, lng) : null);
     }
 
     public void setLocation(Location location) {

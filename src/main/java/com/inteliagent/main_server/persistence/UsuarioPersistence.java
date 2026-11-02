@@ -1,7 +1,6 @@
 package com.inteliagent.main_server.persistence;
 
 import com.inteliagent.main_server.dto.*;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -11,9 +10,12 @@ import java.util.UUID;
 
 @Repository
 public class UsuarioPersistence {
+    public UsuarioPersistence(NamedParameterJdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
+    }
 
-    @Autowired
-    private NamedParameterJdbcTemplate jdbcTemplate;
+
+    private final NamedParameterJdbcTemplate jdbcTemplate;
     public List<UsuarioDTO> getLocationUsers(){
         HashMap<String, Object> sqlMap = new HashMap<>();
 
@@ -22,9 +24,9 @@ public class UsuarioPersistence {
                 " u.latitude,\n" +
                 " u.nome\n" +
                 "FROM \n" +
-                "    usuario u";
+                "    usuario u WHERE u.id_cede = :cede AND u.situacao = 1 LIMIT 500";
 
-        return jdbcTemplate.query(sql, (rs, rowNum) -> {
+        return jdbcTemplate.query(sql, java.util.Map.of("cede", com.inteliagent.main_server.configuration.CurrentUser.cede()), (rs, rowNum) -> {
             UsuarioDTO usuarioDTO = new UsuarioDTO();
             usuarioDTO.setNome(rs.getString("NOME"));
             usuarioDTO.setLatitude(rs.getString("LATITUDE"));
